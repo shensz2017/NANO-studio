@@ -5,7 +5,8 @@
   "main": "dist-electron/main.js",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && electron-builder",
+    "build:main": "esbuild electron-main.js --bundle --platform=node --target=node18 --external:electron --outfile=dist-electron/main.js --format=cjs",
+    "build": "vite build && npm run build:main && electron-builder",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -19,6 +20,7 @@
     "@vitejs/plugin-react": "^4.0.3",
     "typescript": "^5.0.2",
     "vite": "^4.4.5",
+    "esbuild": "^0.18.20",
     "electron": "^26.1.0",
     "electron-builder": "^24.6.3"
   },

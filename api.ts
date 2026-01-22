@@ -16,22 +16,16 @@ export const generateImage = async (task: Task, config: GenerationConfig): Promi
     'Authorization': `Bearer ${config.apiKey}`
   };
 
-  // Convert Base64 array to what the API expects
-  // The spec says "image: array items: string (url or b64_json)"
-  // We will assume b64_json is passed directly if available.
-  
   const body = {
     model: config.model,
     prompt: task.prompt,
-    response_format: 'url', // Or 'b64_json' if preferred for local
+    response_format: 'url',
     aspect_ratio: config.aspectRatio,
     image_size: config.imageSize,
     image: task.referenceImages.length > 0 ? task.referenceImages : undefined
   };
 
   try {
-    // Default to a common proxy endpoint if user doesn't specify one, 
-    // but the UI requires a Base URL.
     const endpoint = `${config.baseUrl.replace(/\/+$/, '')}/v1/images/generations`;
 
     const response = await fetch(endpoint, {
@@ -47,7 +41,6 @@ export const generateImage = async (task: Task, config: GenerationConfig): Promi
     }
 
     if (data.data && data.data.length > 0) {
-      // Return URL or Base64
       return data.data[0].url || data.data[0].b64_json || '';
     } else {
       throw new Error('No image data returned from API');
