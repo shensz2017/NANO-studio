@@ -5,12 +5,17 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: windows-latest
     env:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      
+      GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      GITHUB_RELEASE_TOKEN: ${{ secrets.GH_TOKEN }}
+
     steps:
     - uses: actions/checkout@v4
 
