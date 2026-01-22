@@ -1,4 +1,4 @@
-name: Build & Publish Desktop App
+name: Build & Release Desktop App
 
 on:
   push:
@@ -11,10 +11,6 @@ permissions:
 jobs:
   build:
     runs-on: windows-latest
-    env:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-      GITHUB_RELEASE_TOKEN: ${{ secrets.GH_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
@@ -27,8 +23,30 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Build React App & Electron (Publish)
+      - name: Build App
         run: |
           npx vite build
           npx esbuild electron-main.js --bundle --platform=node --target=node18 --outfile=dist-electron/main.js
-          npx electron-builder --win --x64 --publish always
+          npx electron-builder --win --x64 --publish never
+
+      # 把 exe 上传到 Actions Artifact（保证你一定能拿到文件）
+      - name: Upload Artifact (Exe)
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-installer
+          path: |
+            dist/**/*.exe
+            release/**/*.exe
+            **/*.exe
+
+      # 用当前 commit sha 做一个 release tag（你也可以改成版本号）
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: Build ${{ github.run_number }}
+          files: |
+            dist/**/*.exe
+            release/**/*.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
