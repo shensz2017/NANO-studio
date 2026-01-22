@@ -1,52 +1,33 @@
-name: Build & Release Desktop App
+name: Build Desktop App
 
 on:
   push:
     branches: [ main, master ]
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18
 
-      - name: Install Dependencies
-        run: npm install
+    - name: Install Dependencies
+      run: npm install
 
-      - name: Build App
-        run: |
-          npx vite build
-          npx esbuild electron-main.js --bundle --platform=node --target=node18 --outfile=dist-electron/main.js
-          npx electron-builder --win --x64 --publish never
+    - name: Build React App & Electron
+      run: |
+        npx vite build
+        npx esbuild electron-main.js --bundle --platform=node --target=node18 --external:electron --outfile=dist-electron/main.js
+        npx electron-builder --win --x64
 
-      # 把 exe 上传到 Actions Artifact（保证你一定能拿到文件）
-      - name: Upload Artifact (Exe)
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-installer
-          path: |
-            dist/**/*.exe
-            release/**/*.exe
-            **/*.exe
-
-      # 用当前 commit sha 做一个 release tag（你也可以改成版本号）
-      - name: Create Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: build-${{ github.run_number }}
-          name: Build ${{ github.run_number }}
-          files: |
-            dist/**/*.exe
-            release/**/*.exe
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload Artifacts (The Exe)
+      uses: actions/upload-artifact@v4
+      with:
+        name: NanoBananaStudio-Setup
+        path: release/*.exe
