@@ -1,40 +1,43 @@
-name: Build Desktop App
+name: Build & Publish Desktop App
 
 on:
   push:
     branches: [ main, master ]
   workflow_dispatch:
 
+# 允许 GitHub Actions 对仓库内容（Releases/Assets）进行写操作
 permissions:
   contents: write
 
 jobs:
   build:
     runs-on: windows-latest
+
+    # electron-builder/相关发布库可能读取不同变量名；这里全部对齐到同一个 Secret
     env:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
       GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
       GITHUB_RELEASE_TOKEN: ${{ secrets.GH_TOKEN }}
 
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 18
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
 
-    - name: Install Dependencies
-      run: npm install
+      - name: Install Dependencies
+        run: npm ci
 
-    - name: Build React App & Electron
-      run: |
-        npx vite build
-        npx esbuild electron-main.js --bundle --platform=node --target=node18 --outfile=dist-electron/main.js
-        npx electron-builder --win --x64
+      - name: Build React App
+        run: npx vite build
 
-    - name: Upload Artifacts (The Exe)
-      uses: actions/upload-artifact@v4
-      with:
-        name: NanoBananaStudio-Setup
-        path: release/*.exe
+      - name: Build Electron Main
+        run: npx esbuild electron-main.js --bundle --platform=node --target=node18 --outfile=dist-electron/main.js
+
+      # 发布到 GitHub Releases（publish）
+      - name: Build & Publish (electron-builder)
+        run: npx electron-builder --win --x64 --publish always
