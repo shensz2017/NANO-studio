@@ -2,11 +2,11 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 // @ts-ignore
 import JSZip from 'jszip';
 import { Task, TaskStatus, GenerationConfig, AspectRatio, ImageSize, LogEntry, StagedFile, StagedText } from './types';
-import { generateImage } from './api'; // Changed from ./services/api to ./api
+import { generateImage } from './api'; 
 import { 
   PlayIcon, PlusIcon, TrashIcon, SettingsIcon, FolderIcon, 
   CheckCircleIcon, XCircleIcon, RefreshIcon, SaveIcon, MagicIcon, ListIcon, ArrowDownIcon, DownloadIcon, UserIcon, ImageIcon
-} from './components/Icons';
+} from './Icons'; // Changed from ./components/Icons to ./Icons
 
 // --- Particles Component ---
 const Particles = ({ enabled }: { enabled: boolean }) => {
