@@ -9,7 +9,7 @@ jobs:
   build:
     runs-on: windows-latest
     env:
-      GH_TOKEN: ${{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}}
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
       
     steps:
     - uses: actions/checkout@v4
