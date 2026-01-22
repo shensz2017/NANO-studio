@@ -1,8 +1,8 @@
-import { app, BrowserWindow } from 'electron'
-import path from 'path'
-import { fileURLToPath } from 'url'
+const { app, BrowserWindow } = require('electron')
+const path = require('path')
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
+// Note: In CommonJS, __dirname is globally available, 
+// so we don't need to use import.meta.url
 
 // Prevent multiple instances
 const gotTheLock = app.requestSingleInstanceLock()
@@ -30,6 +30,8 @@ if (!gotTheLock) {
 
     // In production, load the built HTML file
     if (app.isPackaged) {
+      // __dirname points to dist-electron/ when built
+      // The React build is in dist/
       mainWindow.loadFile(path.join(__dirname, '../dist/index.html'))
     } else {
       // In dev, load localhost
